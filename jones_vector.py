@@ -21,6 +21,9 @@ k = 1.
 omega = 1.
 t = 0
 
+is_norm = False
+scale_norm = 1.
+
 
 """ Animation control """
 is_play = False
@@ -90,6 +93,8 @@ def delayed_resize():
     txt_element_ex2.set_fontsize(new_font_size)
     txt_element_ey2.set_fontsize(new_font_size)
 
+    txt_norm.set_fontsize(new_font_size * 0.8)
+
     canvas.draw_idle()
 
 
@@ -106,7 +111,7 @@ var_e_x = tk.StringVar(root)
 var_e_y = tk.StringVar(root)
 var_phi_x_pi = tk.StringVar(root)
 var_phi_y_pi = tk.StringVar(root)
-
+var_is_norm = tk.IntVar(root)
 
 """ Classes and functions """
 
@@ -214,8 +219,9 @@ def complex_exp_latex(n, m):
 def update_diagram():
     global wave_e_x, wave_e_y
     global plt_wave_e_x, plt_wave_e_y, plt_wave_e
-    wave_e_x = e_x * np.cos((k * x - omega * t + phi_x_pi) * np.pi)
-    wave_e_y = e_y * np.cos((k * x - omega * t + phi_y_pi) * np.pi)
+
+    wave_e_x = scale_norm * e_x * np.cos((k * x - omega * t + phi_x_pi) * np.pi)
+    wave_e_y = scale_norm * e_y * np.cos((k * x - omega * t + phi_y_pi) * np.pi)
 
     plt_wave_e_x.set_data_3d(x, wave_e_x, z0)
     plt_wave_e_y.set_data_3d(x, y0, wave_e_y)
@@ -236,17 +242,48 @@ def update_text():
     txt_element_ex2.set_text(element_ex2)
     txt_element_ey2.set_text(element_ey2)
 
+    if scale_norm == 1:
+        txt_norm.set_text("")
+    else:
+        if abs(e_x) == abs(e_y):
+            txt_norm.set_text(f"$\\frac{{1}}{{\\sqrt{{2}}}}$")
+        else:
+            txt_norm.set_text(str(round(scale_norm, 2)))
+
+
+def get_scale_norm():
+    if is_norm:
+        r = np.sqrt(e_x ** 2. + e_y ** 2.)
+        if r != 0:
+            scale = 1. / r
+        else:
+            scale = 1.
+    else:
+        scale = 1.
+
+    return scale
+
+
+def set_is_norm(value):
+    global is_norm, scale_norm
+    is_norm = value
+    scale_norm = get_scale_norm()
+    update_diagram()
+    update_text()
+
 
 def set_e_x(value):
-    global e_x, element_ex1
+    global e_x, element_ex1, scale_norm
     e_x = value
+    scale_norm = get_scale_norm()
     update_text()
     update_diagram()
 
 
 def set_e_y(value):
-    global e_y, element_ey1
+    global e_y, element_ey1, scale_norm
     e_y = value
+    scale_norm = get_scale_norm()
     update_text()
     update_diagram()
 
@@ -276,7 +313,7 @@ def create_parameter_setter():
     # var_e_x = tk.StringVar(root)
     var_e_x.set(str(e_x))
     spn_e_x = tk.Spinbox(
-        frm_e_x, textvariable=var_e_x, format="%.2f", from_=-2., to=2., increment=0.1,
+        frm_e_x, textvariable=var_e_x, format="%.1f", from_=-10., to=10., increment=0.1,
         command=lambda: set_e_x(float(var_e_x.get())), width=5
     )
     spn_e_x.pack(side="left")
@@ -302,7 +339,7 @@ def create_parameter_setter():
     # var_e_y = tk.StringVar(root)
     var_e_y.set(str(e_x))
     spn_e_y = tk.Spinbox(
-        frm_e_y, textvariable=var_e_y, format="%.1f", from_=-2., to=2., increment=0.1,
+        frm_e_y, textvariable=var_e_y, format="%.1f", from_=-10., to=10., increment=0.1,
         command=lambda: set_e_y(float(var_e_y.get())), width=5
     )
     spn_e_y.pack(side="left")
@@ -317,6 +354,16 @@ def create_parameter_setter():
         command=lambda: set_phi_y_pi(float(var_phi_y_pi.get())), width=5
     )
     spn_phi_y.pack(side="left")
+
+    # Normalize
+    frm_norm = ttk.Labelframe(root, relief="ridge", text="Normalize", labelanchor="n")
+    frm_norm.pack(side='left', fill=tk.Y)
+
+    # var_is_norm = tk.IntVar(root)
+    chk_is_norm = tk.Checkbutton(frm_norm, text="Apply", variable=var_is_norm,
+                                 command=lambda: set_is_norm(var_is_norm.get()))
+    chk_is_norm.pack(side='left')
+    var_is_norm.set(is_norm)
 
 
 def create_animation_control():
@@ -463,6 +510,9 @@ if __name__ == "__main__":
 
     txt_element_ex2 = ax1.text(22, 45, element_ex2, fontsize=font_size, va='center')
     txt_element_ey2 = ax1.text(22, 55, element_ey2, fontsize=font_size, va='center')
+
+    norm = ""
+    txt_norm = ax1.text(10, 50, norm, fontsize=font_size, va='center')
 
     draw_bracket(ax1, 20, 20, 30, 16, "black")
     draw_bracket(ax1, 60, 20, 30, 16, "black")
