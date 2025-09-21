@@ -24,6 +24,9 @@ t = 0
 is_norm = False
 scale_norm = 1.
 
+num_arrows = 40
+arrows = []
+
 
 """ Animation control """
 is_play = False
@@ -146,6 +149,36 @@ class Counter:
         return self.count
 
 
+class Arrow3d:
+    def __init__(self, ax, x, y, z, u, v, w, color, line_width, line_style, arrow_length_ratio):
+        self.ax = ax
+        self.x, self.y, self.z = x, y, z
+        self.u, self.v, self.w = u, v, w
+        self.color = color
+        self.line_width = line_width
+        self.line_style = line_style
+        self.arrow_length_ratio = arrow_length_ratio
+
+        self.qvr = self.ax.quiver(self.x, self.y, self.z, self.u, self.v, self.w,
+                                  length=1, color=self.color, normalize=False,
+                                  linewidth=self.line_width, linestyle=self.line_style,
+                                  arrow_length_ratio=self.arrow_length_ratio)
+
+    def _update_quiver(self):
+        self.qvr.remove()
+        self.qvr = self.ax.quiver(self.x, self.y, self.z, self.u, self.v, self.w,
+                                  length=1, color=self.color, normalize=False,
+                                  linewidth=self.line_width, linestyle=self.line_style,
+                                  arrow_length_ratio=self.arrow_length_ratio)
+
+    def set_vector(self, u, v, w):
+        self.u, self.v, self.w = u, v, w
+        self._update_quiver()
+
+    def get_vector(self):
+        return np.array([self.u, self.v, self.w])
+
+
 def complex_exp_latex(n, m):
     # Case n = 0 → always 0
     if abs(n) < 1e-12:
@@ -228,6 +261,12 @@ def update_diagram():
     plt_wave_e_x.set_data_3d(x, wave_e_x, z0)
     plt_wave_e_y.set_data_3d(x, y0, wave_e_y)
     plt_wave_e.set_data_3d(x, wave_e_x, wave_e_y)
+
+    for i in range(num_arrows):
+        x_ = x_min + i * (x_max - x_min) / num_arrows
+        y_ = scale_norm * e_x * np.cos((k * x_ - omega * t + phi_x_pi) * np.pi)
+        z_ = scale_norm * e_y * np.cos((k * x_ - omega * t + phi_y_pi) * np.pi)
+        arrows[i].set_vector(0., y_, z_)
 
 
 def update_text():
@@ -339,7 +378,7 @@ def create_parameter_setter():
     lbl_e_y.pack(side='left')
 
     # var_e_y = tk.StringVar(root)
-    var_e_y.set(str(e_x))
+    var_e_y.set(str(e_y))
     spn_e_y = tk.Spinbox(
         frm_e_y, textvariable=var_e_y, format="%.1f", from_=-10., to=10., increment=0.1,
         command=lambda: set_e_y(float(var_e_y.get())), width=5
@@ -533,6 +572,13 @@ if __name__ == "__main__":
     plt_wave_e_y, = ax0.plot(x, y0, wave_e_y, color="green", ls="--", linewidth=1)
 
     plt_wave_e, = ax0.plot(x, wave_e_x, wave_e_y, color="red", ls="-", linewidth=2)
+
+    for i_ in range(num_arrows):
+        x_ = x_min + i_ * (x_max - x_min) / num_arrows
+        y_ = scale_norm * e_x * np.cos((k * x_ - omega * t + phi_x_pi) * np.pi)
+        z_ = scale_norm * e_y * np.cos((k * x_ - omega * t + phi_y_pi) * np.pi)
+        arrow = Arrow3d(ax0, x_, 0., 0., 0., y_, z_, "red", 0.5, "-", 0.2)
+        arrows.append(arrow)
 
     # ax0.legend(loc='lower right', fontsize=8)
 
