@@ -13,7 +13,7 @@ from fractions import Fraction
 
 """ Global variables """
 e_x = 1.
-e_y = 1.
+e_y = 0.
 phi_x_pi = 0.
 phi_y_pi = 0.
 
@@ -117,19 +117,20 @@ var_is_norm = tk.IntVar(root)
 
 
 class Counter:
-    def __init__(self, is3d=None, ax=None, xy=None, z=None, label=""):
+    def __init__(self, is3d=None, ax=None, xy=None, z=None, label="", color=None):
         self.is3d = is3d if is3d is not None else False
         self.ax = ax
         self.x, self.y = xy[0], xy[1]
         self.z = z if z is not None else 0
         self.label = label
+        self.color  = color
 
         self.count = 0
 
         if not is3d:
-            self.txt_step = self.ax.text(self.x, self.y, self.label + str(self.count), color="white")
+            self.txt_step = self.ax.text(self.x, self.y, self.label + str(self.count), color=color)
         else:
-            self.txt_step = self.ax.text2D(self.x, self.y, self.label + str(self.count), color="white")
+            self.txt_step = self.ax.text2D(self.x, self.y, self.label + str(self.count), color=color)
             self.xz, self.yz, _ = proj3d.proj_transform(self.x, self.y, self.z, self.ax.get_proj())
             self.txt_step.set_position((self.xz, self.yz))
 
@@ -220,6 +221,7 @@ def update_diagram():
     global wave_e_x, wave_e_y
     global plt_wave_e_x, plt_wave_e_y, plt_wave_e
 
+    t = cnt.get() / 10.
     wave_e_x = scale_norm * e_x * np.cos((k * x - omega * t + phi_x_pi) * np.pi)
     wave_e_y = scale_norm * e_y * np.cos((k * x - omega * t + phi_y_pi) * np.pi)
 
@@ -367,12 +369,12 @@ def create_parameter_setter():
 
 
 def create_animation_control():
-    frm_anim = ttk.Labelframe(root, relief="ridge", text="Animation", labelanchor="n")
+    frm_anim = ttk.Labelframe(root, relief="ridge", text="Animation; apply e^i(kz-omega*t)", labelanchor="n")
     frm_anim.pack(side="left", fill=tk.Y)
     btn_play = tk.Button(frm_anim, text="Play/Pause", command=switch)
     btn_play.pack(side="left")
-    # btn_reset = tk.Button(frm_anim, text="Reset", command=reset)
-    # btn_reset.pack(side="left")
+    btn_reset = tk.Button(frm_anim, text="Reset", command=reset)
+    btn_reset.pack(side="left")
     # btn_clear = tk.Button(frm_anim, text="Clear path", command=lambda: aaa())
     # btn_clear.pack(side="left")
 
@@ -411,21 +413,21 @@ def draw_static_diagrams():
     r = 0.5
     y = r * np.cos(theta1)
     z = r * np.sin(theta1)
-    x = np.zeros_like(theta1) + x_max + 0.2
+    x = np.zeros_like(theta1) + x_max - 0.2
 
     ax0.plot(x, y, z, color="darkgray")
 
-    ax0.quiver(x_max + 0.2, 0, - 0.5, 0, 0.1, 0, length=1.5, arrow_length_ratio=1.5, color="darkgray")
+    ax0.quiver(x_max - 0.2, 0, - 0.5, 0, 0.1, 0, length=1.5, arrow_length_ratio=1.5, color="darkgray")
 
     theta2 = np.linspace(- np.pi / 2, np.pi, 100)
     r = 0.5
     y = r * np.cos(theta2)
     z = r * np.sin(theta2)
-    x = np.zeros_like(theta2) + x_max - 0.2
+    x = np.zeros_like(theta2) + x_max + 0.2
 
     ax0.plot(x, y, z, color="darkgray")
 
-    ax0.quiver(x_max - 0.2, 0, - 0.5, 0, - 0.1, 0, length=1.5, arrow_length_ratio=1.5, color="darkgray")
+    ax0.quiver(x_max + 0.2, 0, - 0.5, 0, - 0.1, 0, length=1.5, arrow_length_ratio=1.5, color="darkgray")
 
     ax0.text(x_max + 0.2, 0, 0.5, r"$\mathbf{R}$", color="black", va='center')
     ax0.text(x_max - 0.2, 0, 0.5, r"$\mathbf{L}$", color="black", va='center')
@@ -448,7 +450,7 @@ def reset():
     global is_play
     if is_play:
         is_play = not is_play
-    # cnt.reset()
+    cnt.reset()
     update_diagram()
 
 
@@ -462,13 +464,13 @@ def switch():
 
 def update(f):
     if is_play:
-        # cnt.count_up()
+        cnt.count_up()
         update_diagram()
 
 
 """ main loop """
 if __name__ == "__main__":
-    # cnt = Counter(ax=ax0, is3d=True, xy=np.array([x_min, y_max]), z=z_max, label="Step=")
+    cnt = Counter(ax=ax0, is3d=True, xy=np.array([x_min, y_max]), z=z_max, label="t(/10)=", color="black")
     draw_static_diagrams()
     create_animation_control()
     create_parameter_setter()
