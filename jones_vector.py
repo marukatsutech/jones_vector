@@ -12,8 +12,8 @@ from fractions import Fraction
 
 
 """ Global variables """
-e_x = 1.
-e_y = 0.
+e_0x = 1.
+e_0y = 0.
 phi_x_pi = 0.
 phi_y_pi = 0.
 
@@ -110,8 +110,8 @@ root.bind("<Configure>", lambda e: root.after(100, delayed_resize))
 
 
 """ Global objects of Tkinter """
-var_e_x = tk.StringVar(root)
-var_e_y = tk.StringVar(root)
+var_e_0x = tk.StringVar(root)
+var_e_0y = tk.StringVar(root)
 var_phi_x_pi = tk.StringVar(root)
 var_phi_y_pi = tk.StringVar(root)
 var_is_norm = tk.IntVar(root)
@@ -251,34 +251,34 @@ def complex_exp_latex(n, m):
 
 
 def update_diagram():
-    global wave_e_x, wave_e_y
-    global plt_wave_e_x, plt_wave_e_y, plt_wave_e
+    global wave_e_0x, wave_e_0y
+    global plt_wave_e_0x, plt_wave_e_0y, plt_wave_e
 
     t = cnt.get() / 10.
-    wave_e_x = scale_norm * e_x * np.cos((k * x - omega * t + phi_x_pi) * np.pi)
-    wave_e_y = scale_norm * e_y * np.cos((k * x - omega * t + phi_y_pi) * np.pi)
+    wave_e_0x = scale_norm * e_0x * np.cos((k * x - omega * t + phi_x_pi) * np.pi)
+    wave_e_0y = scale_norm * e_0y * np.cos((k * x - omega * t + phi_y_pi) * np.pi)
 
-    plt_wave_e_x.set_data_3d(x, wave_e_x, z0)
-    plt_wave_e_y.set_data_3d(x, y0, wave_e_y)
-    plt_wave_e.set_data_3d(x, wave_e_x, wave_e_y)
+    plt_wave_e_0x.set_data_3d(x, wave_e_0x, z0)
+    plt_wave_e_0y.set_data_3d(x, y0, wave_e_0y)
+    plt_wave_e.set_data_3d(x, wave_e_0x, wave_e_0y)
 
     for i in range(num_arrows):
         x_ = x_min + i * (x_max - x_min) / num_arrows
-        y_ = scale_norm * e_x * np.cos((k * x_ - omega * t + phi_x_pi) * np.pi)
-        z_ = scale_norm * e_y * np.cos((k * x_ - omega * t + phi_y_pi) * np.pi)
+        y_ = scale_norm * e_0x * np.cos((k * x_ - omega * t + phi_x_pi) * np.pi)
+        z_ = scale_norm * e_0y * np.cos((k * x_ - omega * t + phi_y_pi) * np.pi)
         arrows[i].set_vector(0., y_, z_)
 
 
 def update_text():
     global element_ex1, element_ex2, element_ey1, element_ey2
-    element_ex1 = fr"$|{e_x}| e^{{i{phi_x_pi}\pi}}$"
+    element_ex1 = fr"${e_0x} e^{{i{phi_x_pi}\pi}}$"
     txt_element_ex1.set_text(element_ex1)
 
-    element_ey1 = fr"$|{e_y}| e^{{i{phi_y_pi}\pi}}$"
+    element_ey1 = fr"${e_0y} e^{{i{phi_y_pi}\pi}}$"
     txt_element_ey1.set_text(element_ey1)
 
-    element_ex2 = f"${complex_exp_latex(e_x, phi_x_pi)}$"
-    element_ey2 = f"${complex_exp_latex(e_y, phi_y_pi)}$"
+    element_ex2 = f"${complex_exp_latex(e_0x, phi_x_pi)}$"
+    element_ey2 = f"${complex_exp_latex(e_0y, phi_y_pi)}$"
 
     txt_element_ex2.set_text(element_ex2)
     txt_element_ey2.set_text(element_ey2)
@@ -286,7 +286,7 @@ def update_text():
     if scale_norm == 1:
         txt_norm.set_text("")
     else:
-        if abs(e_x) == abs(e_y):
+        if abs(e_0x) == abs(e_0y):
             txt_norm.set_text(f"$\\frac{{1}}{{\\sqrt{{2}}}}$")
         else:
             txt_norm.set_text(str(round(scale_norm, 2)))
@@ -294,7 +294,7 @@ def update_text():
 
 def get_scale_norm():
     if is_norm:
-        r = np.sqrt(e_x ** 2. + e_y ** 2.)
+        r = np.sqrt(e_0x ** 2. + e_0y ** 2.)
         if r != 0:
             scale = 1. / r
         else:
@@ -313,17 +313,17 @@ def set_is_norm(value):
     update_text()
 
 
-def set_e_x(value):
-    global e_x, element_ex1, scale_norm
-    e_x = value
+def set_e_0x(value):
+    global e_0x, element_ex1, scale_norm
+    e_0x = value
     scale_norm = get_scale_norm()
     update_text()
     update_diagram()
 
 
-def set_e_y(value):
-    global e_y, element_ey1, scale_norm
-    e_y = value
+def set_e_0y(value):
+    global e_0y, element_ey1, scale_norm
+    e_0y = value
     scale_norm = get_scale_norm()
     update_text()
     update_diagram()
@@ -345,53 +345,53 @@ def set_phi_y_pi(value):
 
 def create_parameter_setter():
     # Horizontal
-    frm_e_x = ttk.Labelframe(root, relief="ridge", text="x (horizontal)", labelanchor="n")
-    frm_e_x.pack(side='left', fill=tk.Y)
+    frm_e_0x = ttk.Labelframe(root, relief="ridge", text="x (horizontal)", labelanchor="n")
+    frm_e_0x.pack(side='left', fill=tk.Y)
 
-    lbl_e_x = tk.Label(frm_e_x, text="|E_x|")
-    lbl_e_x.pack(side='left')
+    lbl_e_0x = tk.Label(frm_e_0x, text="E_{0x}")
+    lbl_e_0x.pack(side='left')
 
-    # var_e_x = tk.StringVar(root)
-    var_e_x.set(str(e_x))
-    spn_e_x = tk.Spinbox(
-        frm_e_x, textvariable=var_e_x, format="%.1f", from_=-10., to=10., increment=0.1,
-        command=lambda: set_e_x(float(var_e_x.get())), width=5
+    # var_e_0x = tk.StringVar(root)
+    var_e_0x.set(str(e_0x))
+    spn_e_0x = tk.Spinbox(
+        frm_e_0x, textvariable=var_e_0x, format="%.1f", from_=-10., to=10., increment=0.1,
+        command=lambda: set_e_0x(float(var_e_0x.get())), width=5
     )
-    spn_e_x.pack(side="left")
+    spn_e_0x.pack(side="left")
 
-    lbl_phi_x = tk.Label(frm_e_x, text="Phi_x(*pi)")
+    lbl_phi_x = tk.Label(frm_e_0x, text="Phi_x(*pi)")
     lbl_phi_x.pack(side='left')
 
     # var_phi_x_pi = tk.StringVar(root)
     var_phi_x_pi.set(str(phi_x_pi))
     spn_phi_x = tk.Spinbox(
-        frm_e_x, textvariable=var_phi_x_pi, format="%.2f", from_=-4., to=4., increment=0.05,
+        frm_e_0x, textvariable=var_phi_x_pi, format="%.2f", from_=-4., to=4., increment=0.05,
         command=lambda: set_phi_x_pi(float(var_phi_x_pi.get())), width=5
     )
     spn_phi_x.pack(side="left")
 
     # Vertical
-    frm_e_y = ttk.Labelframe(root, relief="ridge", text="y (vertical)", labelanchor="n")
-    frm_e_y.pack(side='left', fill=tk.Y)
+    frm_e_0y = ttk.Labelframe(root, relief="ridge", text="y (vertical)", labelanchor="n")
+    frm_e_0y.pack(side='left', fill=tk.Y)
 
-    lbl_e_y = tk.Label(frm_e_y, text="|E_y|")
-    lbl_e_y.pack(side='left')
+    lbl_e_0y = tk.Label(frm_e_0y, text="E_{0y}")
+    lbl_e_0y.pack(side='left')
 
-    # var_e_y = tk.StringVar(root)
-    var_e_y.set(str(e_y))
-    spn_e_y = tk.Spinbox(
-        frm_e_y, textvariable=var_e_y, format="%.1f", from_=-10., to=10., increment=0.1,
-        command=lambda: set_e_y(float(var_e_y.get())), width=5
+    # var_e_0y = tk.StringVar(root)
+    var_e_0y.set(str(e_0y))
+    spn_e_0y = tk.Spinbox(
+        frm_e_0y, textvariable=var_e_0y, format="%.1f", from_=-10., to=10., increment=0.1,
+        command=lambda: set_e_0y(float(var_e_0y.get())), width=5
     )
-    spn_e_y.pack(side="left")
+    spn_e_0y.pack(side="left")
 
-    lbl_phi_y = tk.Label(frm_e_y, text="Phi_y(*pi)")
+    lbl_phi_y = tk.Label(frm_e_0y, text="Phi_y(*pi)")
     lbl_phi_y.pack(side='left')
 
     # var_phi_y_pi = tk.StringVar(root)
     var_phi_y_pi.set(str(phi_x_pi))
     spn_phi_y = tk.Spinbox(
-        frm_e_y, textvariable=var_phi_y_pi, format="%.2f", from_=-4., to=4., increment=0.05,
+        frm_e_0y, textvariable=var_phi_y_pi, format="%.2f", from_=-4., to=4., increment=0.05,
         command=lambda: set_phi_y_pi(float(var_phi_y_pi.get())), width=5
     )
     spn_phi_y.pack(side="left")
@@ -516,18 +516,18 @@ if __name__ == "__main__":
     font_size = 16
 
     vector_e = r"$\mathbf{J} =$"
-    element_ex = r"$|E_x| e^{i\phi_x}$"
-    element_ey = r"$|E_y| e^{i\phi_y}$"
-    ef_wave_x = (r"$|E_x| e^{i(kz - \omega t +\phi_x)} = |E_x| e^{i(kz- \omega t)} e^{i\phi_x} = "
-                 r"|E_x| e^{i\phi_x} e^{i(kz - \omega t)} $")
-    ef_wave_y = (r"$|E_y| e^{i(kz - \omega t +\phi_y)} = |E_y| e^{i(kz- \omega t)} e^{i\phi_y} = "
-                 r"|E_y| e^{i\phi_y} e^{i(kz - \omega t)} $")
+    element_ex = r"$E_{0x} e^{i\phi_x}$"
+    element_ey = r"$E_{0y} e^{i\phi_y}$"
+    ef_wave_0x = (r"$E_x = E_{0x} e^{i(kz - \omega t +\phi_x)} = E_{0x} e^{i(kz- \omega t)} e^{i\phi_x} = "
+                 r"E_{0x} e^{i\phi_x} e^{i(kz - \omega t)} $")
+    ef_wave_0y = (r"$E_y = E_{0y} e^{i(kz - \omega t +\phi_y)} = E_{0y} e^{i(kz- \omega t)} e^{i\phi_y} = "
+                 r"E_{0y} e^{i\phi_y} e^{i(kz - \omega t)} $")
     # euler = r"$e^{i\theta} = \cos \theta + i \sin \theta$"
 
     equal = r"$=$"
 
-    element_ex1 = fr"${e_x} e^{{i{phi_x_pi}\pi}}$"
-    element_ey1 = fr"${e_y} e^{{i{phi_y_pi}\pi}}$"
+    element_ex1 = fr"${e_0x} e^{{i{phi_x_pi}\pi}}$"
+    element_ey1 = fr"${e_0y} e^{{i{phi_y_pi}\pi}}$"
 
     txt_e = ax1.text(5, 20, vector_e, fontsize=font_size, va='center')
     txt_element_ex = ax1.text(22, 15, element_ex, fontsize=font_size, va='center')
@@ -538,16 +538,16 @@ if __name__ == "__main__":
     txt_element_ey1 = ax1.text(62, 25, element_ey1, fontsize=font_size, va='center')
 
     txt_note = ax1.text(5, 70, "Electric field wave", fontsize=font_size * 0.8, va='center')
-    txt_wave_x = ax1.text(10, 76, ef_wave_x, fontsize=font_size * 0.8, va='center', color="blue")
-    txt_wave_y = ax1.text(10, 82, ef_wave_y, fontsize=font_size * 0.8, va='center', color="green")
+    txt_wave_0x = ax1.text(10, 76, ef_wave_0x, fontsize=font_size * 0.8, va='center', color="blue")
+    txt_wave_0y = ax1.text(10, 82, ef_wave_0y, fontsize=font_size * 0.8, va='center', color="green")
     txt_note1 = ax1.text(10, 90, "Note; the graph only represents the real part.",
                          fontsize=font_size * 0.6, va='center')
     # txt_euler = ax1.text(10, 96, euler, fontsize=font_size * 0.8, va='center')
 
     txt_equal1 = ax1.text(5, 50, equal, fontsize=font_size, va='center')
 
-    element_ex2 = f"${complex_exp_latex(e_x, phi_x_pi)}$"
-    element_ey2 = f"${complex_exp_latex(e_y, phi_y_pi)}$"
+    element_ex2 = f"${complex_exp_latex(e_0x, phi_x_pi)}$"
+    element_ey2 = f"${complex_exp_latex(e_0y, phi_y_pi)}$"
 
     txt_element_ex2 = ax1.text(22, 45, element_ex2, fontsize=font_size, va='center')
     txt_element_ey2 = ax1.text(22, 55, element_ey2, fontsize=font_size, va='center')
@@ -565,18 +565,18 @@ if __name__ == "__main__":
     y0 = x * 0. + y_max
     z0 = x * 0. + z_min
 
-    wave_e_x = e_x * np.cos((k * x - omega * t + phi_x_pi) * np.pi)
-    plt_wave_e_x, = ax0.plot(x, wave_e_x, z0, color="blue", ls="--", linewidth=1)
+    wave_e_0x = e_0x * np.cos((k * x - omega * t + phi_x_pi) * np.pi)
+    plt_wave_e_0x, = ax0.plot(x, wave_e_0x, z0, color="blue", ls="--", linewidth=1)
 
-    wave_e_y = e_y * np.cos((k * x - omega * t + phi_y_pi) * np.pi)
-    plt_wave_e_y, = ax0.plot(x, y0, wave_e_y, color="green", ls="--", linewidth=1)
+    wave_e_0y = e_0y * np.cos((k * x - omega * t + phi_y_pi) * np.pi)
+    plt_wave_e_0y, = ax0.plot(x, y0, wave_e_0y, color="green", ls="--", linewidth=1)
 
-    plt_wave_e, = ax0.plot(x, wave_e_x, wave_e_y, color="red", ls="-", linewidth=2)
+    plt_wave_e, = ax0.plot(x, wave_e_0x, wave_e_0y, color="red", ls="-", linewidth=2)
 
     for i_ in range(num_arrows):
         x_ = x_min + i_ * (x_max - x_min) / num_arrows
-        y_ = scale_norm * e_x * np.cos((k * x_ - omega * t + phi_x_pi) * np.pi)
-        z_ = scale_norm * e_y * np.cos((k * x_ - omega * t + phi_y_pi) * np.pi)
+        y_ = scale_norm * e_0x * np.cos((k * x_ - omega * t + phi_x_pi) * np.pi)
+        z_ = scale_norm * e_0y * np.cos((k * x_ - omega * t + phi_y_pi) * np.pi)
         arrow = Arrow3d(ax0, x_, 0., 0., 0., y_, z_, "red", 0.5, "-", 0.2)
         arrows.append(arrow)
 
